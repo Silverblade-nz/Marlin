@@ -22,9 +22,13 @@
 #pragma once
 
 #ifdef STM32F1xx
-  #include <stm32f1xx_hal.h>
+  #include "stm32f1xx_hal.h"
 #elif defined(STM32F4xx)
-  #include <stm32f4xx_hal.h>
+  #include "stm32f4xx_hal.h"
+#elif defined(STM32H7xx)
+  #include "stm32h7xx_hal.h"
+#else
+  #error SPI Touch Screen is currently only supported on STM32F1, STM32F4 and STM32H7 hardware.
 #endif
 
 #include "../../../inc/MarlinConfig.h"
@@ -56,7 +60,7 @@ enum XPTCoordinate : uint8_t {
   XPT2046_Z2 = 0x40 | XPT2046_CONTROL | XPT2046_DFR_MODE,
 };
 
-#if !defined(XPT2046_Z1_THRESHOLD)
+#ifndef XPT2046_Z1_THRESHOLD
   #define XPT2046_Z1_THRESHOLD 10
 #endif
 
@@ -69,13 +73,13 @@ private:
   static uint16_t getRawData(const XPTCoordinate coordinate);
   static bool isTouched();
 
-  static inline void DataTransferBegin() { if (SPIx.Instance) { HAL_SPI_Init(&SPIx); } WRITE(TOUCH_CS_PIN, LOW); };
-  static inline void DataTransferEnd() { WRITE(TOUCH_CS_PIN, HIGH); };
-  static uint16_t HardwareIO(uint16_t data);
-  static uint16_t SoftwareIO(uint16_t data);
-  static uint16_t IO(uint16_t data = 0) { return SPIx.Instance ? HardwareIO(data) : SoftwareIO(data); }
+  static void dataTransferBegin() { if (SPIx.Instance) { HAL_SPI_Init(&SPIx); } WRITE(TOUCH_CS_PIN, LOW); };
+  static void dataTransferEnd() { WRITE(TOUCH_CS_PIN, HIGH); };
+  static uint16_t hardwareIO(uint16_t data);
+  static uint16_t softwareIO(uint16_t data);
+  static uint16_t IO(uint16_t data = 0) { return SPIx.Instance ? hardwareIO(data) : softwareIO(data); }
 
 public:
-  static void Init();
-  static bool getRawPoint(int16_t *x, int16_t *y);
+  static void init();
+  static bool getRawPoint(int16_t * const x, int16_t * const y);
 };

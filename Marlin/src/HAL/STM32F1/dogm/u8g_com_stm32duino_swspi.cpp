@@ -2,6 +2,9 @@
  * Marlin 3D Printer Firmware
  * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
+ * Based on Sprinter and grbl.
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,13 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+
 #ifdef __STM32F1__
 
 #include "../../../inc/MarlinConfig.h"
 
-#if BOTH(HAS_MARLINUI_U8GLIB, FORCE_SOFT_SPI)
+#if ALL(HAS_MARLINUI_U8GLIB, FORCE_SOFT_SPI)
 
-#include <U8glib.h>
+#include <U8glib-HAL.h>
 #include "../../shared/HAL_SPI.h"
 
 #ifndef LCD_SPI_SPEED
@@ -33,7 +37,7 @@
 static uint8_t SPI_speed = LCD_SPI_SPEED;
 
 static inline uint8_t swSpiTransfer_mode_0(uint8_t b, const uint8_t spi_speed, const pin_t miso_pin=-1) {
-  LOOP_L_N(i, 8) {
+  for (uint8_t i = 0; i < 8; ++i) {
     if (spi_speed == 0) {
       WRITE(DOGLCD_MOSI, !!(b & 0x80));
       WRITE(DOGLCD_SCK, HIGH);
@@ -43,16 +47,16 @@ static inline uint8_t swSpiTransfer_mode_0(uint8_t b, const uint8_t spi_speed, c
     }
     else {
       const uint8_t state = (b & 0x80) ? HIGH : LOW;
-      LOOP_L_N(j, spi_speed)
+      for (uint8_t j = 0; j < spi_speed; ++j)
         WRITE(DOGLCD_MOSI, state);
 
-      LOOP_L_N(j, spi_speed + (miso_pin >= 0 ? 0 : 1))
+      for (uint8_t j = 0; j < spi_speed + (miso_pin >= 0 ? 0 : 1); ++j)
         WRITE(DOGLCD_SCK, HIGH);
 
       b <<= 1;
       if (miso_pin >= 0 && READ(miso_pin)) b |= 1;
 
-      LOOP_L_N(j, spi_speed)
+      for (uint8_t j = 0; j < spi_speed; ++j)
         WRITE(DOGLCD_SCK, LOW);
     }
   }
@@ -60,7 +64,7 @@ static inline uint8_t swSpiTransfer_mode_0(uint8_t b, const uint8_t spi_speed, c
 }
 
 static inline uint8_t swSpiTransfer_mode_3(uint8_t b, const uint8_t spi_speed, const pin_t miso_pin=-1) {
-  LOOP_L_N(i, 8) {
+  for (uint8_t i = 0; i < 8; ++i) {
     const uint8_t state = (b & 0x80) ? HIGH : LOW;
     if (spi_speed == 0) {
       WRITE(DOGLCD_SCK, LOW);
@@ -69,13 +73,13 @@ static inline uint8_t swSpiTransfer_mode_3(uint8_t b, const uint8_t spi_speed, c
       WRITE(DOGLCD_SCK, HIGH);
     }
     else {
-      LOOP_L_N(j, spi_speed + (miso_pin >= 0 ? 0 : 1))
+      for (uint8_t j = 0; j < spi_speed + (miso_pin >= 0 ? 0 : 1); ++j)
         WRITE(DOGLCD_SCK, LOW);
 
-      LOOP_L_N(j, spi_speed)
+      for (uint8_t j = 0; j < spi_speed; ++j)
         WRITE(DOGLCD_MOSI, state);
 
-      LOOP_L_N(j, spi_speed)
+      for (uint8_t j = 0; j < spi_speed; ++j)
         WRITE(DOGLCD_SCK, HIGH);
     }
     b <<= 1;
@@ -84,7 +88,7 @@ static inline uint8_t swSpiTransfer_mode_3(uint8_t b, const uint8_t spi_speed, c
   return b;
 }
 
-static void u8g_sw_spi_HAL_STM32F1_shift_out(uint8_t val) {
+static void u8g_sw_spi_shift_out(uint8_t val) {
   #if ENABLED(FYSETC_MINI_12864)
     swSpiTransfer_mode_3(val, SPI_speed);
   #else
@@ -135,13 +139,13 @@ uint8_t u8g_com_HAL_STM32F1_sw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, 
       break;
 
     case U8G_COM_MSG_WRITE_BYTE:
-      u8g_sw_spi_HAL_STM32F1_shift_out(arg_val);
+      u8g_sw_spi_shift_out(arg_val);
       break;
 
     case U8G_COM_MSG_WRITE_SEQ: {
       uint8_t *ptr = (uint8_t *)arg_ptr;
       while (arg_val > 0) {
-        u8g_sw_spi_HAL_STM32F1_shift_out(*ptr++);
+        u8g_sw_spi_shift_out(*ptr++);
         arg_val--;
       }
     } break;
@@ -149,7 +153,7 @@ uint8_t u8g_com_HAL_STM32F1_sw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, 
     case U8G_COM_MSG_WRITE_SEQ_P: {
       uint8_t *ptr = (uint8_t *)arg_ptr;
       while (arg_val > 0) {
-        u8g_sw_spi_HAL_STM32F1_shift_out(u8g_pgm_read(ptr));
+        u8g_sw_spi_shift_out(u8g_pgm_read(ptr));
         ptr++;
         arg_val--;
       }

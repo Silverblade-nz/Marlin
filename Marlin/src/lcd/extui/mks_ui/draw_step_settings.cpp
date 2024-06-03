@@ -19,9 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+
 #include "../../../inc/MarlinConfigPre.h"
 
-#if HAS_TFT_LVGL_UI
+#if ALL(HAS_TFT_LVGL_UI, EDITABLE_STEPS_PER_UNIT)
 
 #include "draw_ui.h"
 #include <lv_conf.h>
@@ -103,7 +104,7 @@ void lv_draw_step_settings() {
     lv_big_button_create(scr, "F:/bmp_back70x40.bin", machine_menu.previous, PARA_UI_TURN_PAGE_POS_X, PARA_UI_TURN_PAGE_POS_Y, event_handler, ID_STEP_UP, true);
   }
 
-  lv_big_button_create(scr, "F:/bmp_back70x40.bin", common_menu.text_back, PARA_UI_BACL_POS_X, PARA_UI_BACL_POS_Y, event_handler, ID_STEP_RETURN, true);
+  lv_big_button_create(scr, "F:/bmp_back70x40.bin", common_menu.text_back, PARA_UI_BACK_POS_X, PARA_UI_BACK_POS_Y, event_handler, ID_STEP_RETURN, true);
 }
 
 void lv_clear_step_settings() {
@@ -113,4 +114,4 @@ void lv_clear_step_settings() {
   lv_obj_del(scr);
 }
 
-#endif // HAS_TFT_LVGL_UI
+#endif // HAS_TFT_LVGL_UI && EDITABLE_STEPS_PER_UNIT

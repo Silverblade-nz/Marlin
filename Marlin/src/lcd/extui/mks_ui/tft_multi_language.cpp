@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+
 #include "../../../inc/MarlinConfigPre.h"
 
 #if HAS_TFT_LVGL_UI
@@ -57,6 +58,8 @@ MachinePara_menu_def         MachinePara_menu;
 pause_msg_def                pause_msg_menu;
 eeprom_def                   eeprom_menu;
 media_select_menu_def        media_select_menu;
+
+// TODO: Make all strings PSTR and update accessors for the benefit of AVR
 
 machine_common_def machine_menu;
 void machine_setting_disp() {
@@ -164,7 +167,7 @@ void machine_setting_disp() {
     machine_menu.Extrude_Min_Temper   = EXTRUD_MIN_TEMPER_CN;
 
     machine_menu.HotbedConfTitle      = HOTBED_CONF_TITLE_CN;
-    machine_menu.HotbedAjustType      = HOTBED_ADJUST_CN;
+    machine_menu.HotbedAdjustType     = HOTBED_ADJUST_CN;
     machine_menu.HotbedMinTemperature = HOTBED_MIN_TEMPERATURE_CN;
     machine_menu.HotbedMaxTemperature = HOTBED_MAX_TEMPERATURE_CN;
 
@@ -205,12 +208,14 @@ void machine_setting_disp() {
     machine_menu.Z_Jerk        = Z_JERK_CN;
     machine_menu.E_Jerk        = E_JERK_CN;
 
-    machine_menu.StepsConfTitle = STEPS_CONF_TITLE_CN;
-    machine_menu.X_Steps        = X_STEPS_CN;
-    machine_menu.Y_Steps        = Y_STEPS_CN;
-    machine_menu.Z_Steps        = Z_STEPS_CN;
-    machine_menu.E0_Steps       = E0_STEPS_CN;
-    machine_menu.E1_Steps       = E1_STEPS_CN;
+    #if ENABLED(EDITABLE_STEPS_PER_UNIT)
+      machine_menu.StepsConfTitle = STEPS_CONF_TITLE_CN;
+      machine_menu.X_Steps        = X_STEPS_CN;
+      machine_menu.Y_Steps        = Y_STEPS_CN;
+      machine_menu.Z_Steps        = Z_STEPS_CN;
+      machine_menu.E0_Steps       = E0_STEPS_CN;
+      machine_menu.E1_Steps       = E1_STEPS_CN;
+    #endif
 
     machine_menu.TmcCurrentConfTitle = TMC_CURRENT_CONF_TITLE_CN;
     machine_menu.X_Current           = X_TMC_CURRENT_CN;
@@ -392,7 +397,7 @@ void machine_setting_disp() {
     machine_menu.Extrude_Min_Temper   = EXTRUD_MIN_TEMPER_T_CN;
 
     machine_menu.HotbedConfTitle      = HOTBED_CONF_TITLE_T_CN;
-    machine_menu.HotbedAjustType      = HOTBED_ADJUST_T_CN;
+    machine_menu.HotbedAdjustType     = HOTBED_ADJUST_T_CN;
     machine_menu.HotbedMinTemperature = HOTBED_MIN_TEMPERATURE_T_CN;
     machine_menu.HotbedMaxTemperature = HOTBED_MAX_TEMPERATURE_T_CN;
 
@@ -433,12 +438,14 @@ void machine_setting_disp() {
     machine_menu.Z_Jerk        = Z_JERK_T_CN;
     machine_menu.E_Jerk        = E_JERK_T_CN;
 
-    machine_menu.StepsConfTitle = STEPS_CONF_TITLE_T_CN;
-    machine_menu.X_Steps        = X_STEPS_T_CN;
-    machine_menu.Y_Steps        = Y_STEPS_T_CN;
-    machine_menu.Z_Steps        = Z_STEPS_T_CN;
-    machine_menu.E0_Steps       = E0_STEPS_T_CN;
-    machine_menu.E1_Steps       = E1_STEPS_T_CN;
+    #if ENABLED(EDITABLE_STEPS_PER_UNIT)
+      machine_menu.StepsConfTitle = STEPS_CONF_TITLE_T_CN;
+      machine_menu.X_Steps        = X_STEPS_T_CN;
+      machine_menu.Y_Steps        = Y_STEPS_T_CN;
+      machine_menu.Z_Steps        = Z_STEPS_T_CN;
+      machine_menu.E0_Steps       = E0_STEPS_T_CN;
+      machine_menu.E1_Steps       = E1_STEPS_T_CN;
+    #endif
 
     machine_menu.TmcCurrentConfTitle = TMC_CURRENT_CONF_TITLE_T_CN;
     machine_menu.X_Current           = X_TMC_CURRENT_T_CN;
@@ -575,6 +582,8 @@ void machine_setting_disp() {
     machine_menu.OutLength           = FILAMENT_OUT_LENGTH_EN;
     machine_menu.OutSpeed            = FILAMENT_OUT_SPEED_EN;
 
+    machine_menu.LevelingZoffsetTitle = LEVELING_ZOFFSET_TITLE_EN;
+
     machine_menu.LevelingParaConfTitle   = LEVELING_CONF_TITLE_EN;
     machine_menu.LevelingParaConf        = LEVELING_PARA_CONF_EN;
     machine_menu.TrammingPosConf         = TRAMMING_POS_EN;
@@ -622,7 +631,7 @@ void machine_setting_disp() {
 
     machine_menu.HotbedEnable         = HOTBED_ENABLE_EN;
     machine_menu.HotbedConfTitle      = HOTBED_CONF_TITLE_EN;
-    machine_menu.HotbedAjustType      = HOTBED_ADJUST_EN;
+    machine_menu.HotbedAdjustType     = HOTBED_ADJUST_EN;
     machine_menu.HotbedMinTemperature = HOTBED_MIN_TEMPERATURE_EN;
     machine_menu.HotbedMaxTemperature = HOTBED_MAX_TEMPERATURE_EN;
 
@@ -663,12 +672,14 @@ void machine_setting_disp() {
     machine_menu.Z_Jerk        = Z_JERK_EN;
     machine_menu.E_Jerk        = E_JERK_EN;
 
-    machine_menu.StepsConfTitle = STEPS_CONF_TITLE_EN;
-    machine_menu.X_Steps        = X_STEPS_EN;
-    machine_menu.Y_Steps        = Y_STEPS_EN;
-    machine_menu.Z_Steps        = Z_STEPS_EN;
-    machine_menu.E0_Steps       = E0_STEPS_EN;
-    machine_menu.E1_Steps       = E1_STEPS_EN;
+    #if ENABLED(EDITABLE_STEPS_PER_UNIT)
+      machine_menu.StepsConfTitle = STEPS_CONF_TITLE_EN;
+      machine_menu.X_Steps        = X_STEPS_EN;
+      machine_menu.Y_Steps        = Y_STEPS_EN;
+      machine_menu.Z_Steps        = Z_STEPS_EN;
+      machine_menu.E0_Steps       = E0_STEPS_EN;
+      machine_menu.E1_Steps       = E1_STEPS_EN;
+    #endif
 
     machine_menu.TmcCurrentConfTitle = TMC_CURRENT_CONF_TITLE_EN;
     machine_menu.X_Current           = X_TMC_CURRENT_EN;
@@ -764,11 +775,12 @@ void disp_language_init() {
   move_menu.z_add = AXIS_Z_ADD_TEXT;
   move_menu.z_dec = AXIS_Z_DEC_TEXT;
 
-  move_menu.step_001mm = TEXT_001MM;
-  move_menu.step_005mm = TEXT_005MM;
-  move_menu.step_01mm  = TEXT_01MM;
-  move_menu.step_1mm   = TEXT_1MM;
-  move_menu.step_10mm  = TEXT_10MM;
+  move_menu.step_001mm  = TEXT_001MM;
+  move_menu.step_0025mm = TEXT_0025MM;
+  move_menu.step_005mm  = TEXT_005MM;
+  move_menu.step_01mm   = TEXT_01MM;
+  move_menu.step_1mm    = TEXT_1MM;
+  move_menu.step_10mm   = TEXT_10MM;
 
   home_menu.home_x   = HOME_X_TEXT;
   home_menu.home_y   = HOME_Y_TEXT;
@@ -1093,8 +1105,8 @@ void disp_language_init() {
       eeprom_menu.read             = EEPROM_SETTINGS_READ_CN;
       eeprom_menu.revert           = EEPROM_SETTINGS_REVERT_CN;
       eeprom_menu.storeTips        = EEPROM_STORE_TIPS_CN;
-      eeprom_menu.readTips         =  EEPROM_READ_TIPS_CN;
-      eeprom_menu.revertTips       =  EEPROM_REVERT_TIPS_CN;
+      eeprom_menu.readTips         = EEPROM_READ_TIPS_CN;
+      eeprom_menu.revertTips       = EEPROM_REVERT_TIPS_CN;
       break;
 
       #if 1
@@ -1337,12 +1349,13 @@ void disp_language_init() {
             eeprom_menu.read             = EEPROM_SETTINGS_READ_T_CN;
             eeprom_menu.revert           = EEPROM_SETTINGS_REVERT_T_CN;
             eeprom_menu.storeTips        = EEPROM_STORE_TIPS_T_CN;
-            eeprom_menu.readTips         =  EEPROM_READ_TIPS_T_CN;
-            eeprom_menu.revertTips       =  EEPROM_REVERT_TIPS_T_CN;
+            eeprom_menu.readTips         = EEPROM_READ_TIPS_T_CN;
+            eeprom_menu.revertTips       = EEPROM_REVERT_TIPS_T_CN;
             break;
           case LANG_ENGLISH:
             common_menu.dialog_confirm_title  = TITLE_DIALOG_CONFIRM_EN;
             common_menu.text_back             = BACK_TEXT_EN;
+            common_menu.text_save             = SAVE_TEXT_EN;
             common_menu.close_machine_tips    = DIALOG_CLOSE_MACHINE_EN;
             common_menu.unbind_printer_tips   = DIALOG_UNBIND_PRINTER_EN;
             common_menu.print_special_title   = PRINTING_OTHER_LANGUGE;
@@ -1571,8 +1584,8 @@ void disp_language_init() {
             eeprom_menu.read             = EEPROM_SETTINGS_READ_EN;
             eeprom_menu.revert           = EEPROM_SETTINGS_REVERT_EN;
             eeprom_menu.storeTips        = EEPROM_STORE_TIPS_EN;
-            eeprom_menu.readTips         =  EEPROM_READ_TIPS_EN;
-            eeprom_menu.revertTips       =  EEPROM_REVERT_TIPS_EN;
+            eeprom_menu.readTips         = EEPROM_READ_TIPS_EN;
+            eeprom_menu.revertTips       = EEPROM_REVERT_TIPS_EN;
             break;
           case LANG_RUSSIAN:
             common_menu.dialog_confirm_title  = TITLE_DIALOG_CONFIRM_RU;
@@ -1740,12 +1753,14 @@ void disp_language_init() {
             machine_menu.Z_Jerk        = Z_JERK_RU;
             machine_menu.E_Jerk        = E_JERK_RU;
 
-            machine_menu.StepsConfTitle = STEPS_CONF_TITLE_RU;
-            machine_menu.X_Steps        = X_STEPS_RU;
-            machine_menu.Y_Steps        = Y_STEPS_RU;
-            machine_menu.Z_Steps        = Z_STEPS_RU;
-            machine_menu.E0_Steps       = E0_STEPS_RU;
-            machine_menu.E1_Steps       = E1_STEPS_RU;
+            #if ENABLED(EDITABLE_STEPS_PER_UNIT)
+              machine_menu.StepsConfTitle = STEPS_CONF_TITLE_RU;
+              machine_menu.X_Steps        = X_STEPS_RU;
+              machine_menu.Y_Steps        = Y_STEPS_RU;
+              machine_menu.Z_Steps        = Z_STEPS_RU;
+              machine_menu.E0_Steps       = E0_STEPS_RU;
+              machine_menu.E1_Steps       = E1_STEPS_RU;
+            #endif
 
             machine_menu.TmcCurrentConfTitle = TMC_CURRENT_CONF_TITLE_RU;
             machine_menu.X_Current           = X_TMC_CURRENT_RU;
@@ -1896,8 +1911,8 @@ void disp_language_init() {
             eeprom_menu.read             = EEPROM_SETTINGS_READ_RU;
             eeprom_menu.revert           = EEPROM_SETTINGS_REVERT_RU;
             eeprom_menu.storeTips        = EEPROM_STORE_TIPS_RU;
-            eeprom_menu.readTips         =  EEPROM_READ_TIPS_RU;
-            eeprom_menu.revertTips       =  EEPROM_REVERT_TIPS_RU;
+            eeprom_menu.readTips         = EEPROM_READ_TIPS_RU;
+            eeprom_menu.revertTips       = EEPROM_REVERT_TIPS_RU;
             break;
           case LANG_SPANISH:
             common_menu.dialog_confirm_title  = TITLE_DIALOG_CONFIRM_SP;
@@ -2133,8 +2148,8 @@ void disp_language_init() {
             eeprom_menu.read             = EEPROM_SETTINGS_READ_SP;
             eeprom_menu.revert           = EEPROM_SETTINGS_REVERT_SP;
             eeprom_menu.storeTips        = EEPROM_STORE_TIPS_SP;
-            eeprom_menu.readTips         =  EEPROM_READ_TIPS_SP;
-            eeprom_menu.revertTips       =  EEPROM_REVERT_TIPS_SP;
+            eeprom_menu.readTips         = EEPROM_READ_TIPS_SP;
+            eeprom_menu.revertTips       = EEPROM_REVERT_TIPS_SP;
             break;
 
         #endif // if 1
@@ -2367,8 +2382,8 @@ void disp_language_init() {
           eeprom_menu.read             = EEPROM_SETTINGS_READ_FR;
           eeprom_menu.revert           = EEPROM_SETTINGS_REVERT_FR;
           eeprom_menu.storeTips        = EEPROM_STORE_TIPS_FR;
-          eeprom_menu.readTips         =  EEPROM_READ_TIPS_FR;
-          eeprom_menu.revertTips       =  EEPROM_REVERT_TIPS_FR;
+          eeprom_menu.readTips         = EEPROM_READ_TIPS_FR;
+          eeprom_menu.revertTips       = EEPROM_REVERT_TIPS_FR;
           break;
 
         case LANG_ITALY:
@@ -2600,8 +2615,8 @@ void disp_language_init() {
           eeprom_menu.read             = EEPROM_SETTINGS_READ_IT;
           eeprom_menu.revert           = EEPROM_SETTINGS_REVERT_IT;
           eeprom_menu.storeTips        = EEPROM_STORE_TIPS_IT;
-          eeprom_menu.readTips         =  EEPROM_READ_TIPS_IT;
-          eeprom_menu.revertTips       =  EEPROM_REVERT_TIPS_IT;
+          eeprom_menu.readTips         = EEPROM_READ_TIPS_IT;
+          eeprom_menu.revertTips       = EEPROM_REVERT_TIPS_IT;
           break;
 
       #endif // if 1
@@ -2836,8 +2851,8 @@ void disp_language_init() {
       eeprom_menu.read             = EEPROM_SETTINGS_READ_EN;
       eeprom_menu.revert           = EEPROM_SETTINGS_REVERT_EN;
       eeprom_menu.storeTips        = EEPROM_STORE_TIPS_EN;
-      eeprom_menu.readTips         =  EEPROM_READ_TIPS_EN;
-      eeprom_menu.revertTips       =  EEPROM_REVERT_TIPS_EN;
+      eeprom_menu.readTips         = EEPROM_READ_TIPS_EN;
+      eeprom_menu.revertTips       = EEPROM_REVERT_TIPS_EN;
       break;
   }
 }

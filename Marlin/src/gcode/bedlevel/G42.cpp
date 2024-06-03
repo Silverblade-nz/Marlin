@@ -32,6 +32,12 @@
 
 /**
  * G42: Move X & Y axes to mesh coordinates (I & J)
+ *
+ * Parameters:
+ *   F<feedrate> : Feedrate in mm/min
+ *   I<index>    : X axis point index
+ *   J<index>    : Y axis point index
+ *   P<bool>     : Flag to put the prove at the given point
  */
 void GcodeSuite::G42() {
   if (MOTION_CONDITIONS) {
@@ -48,8 +54,8 @@ void GcodeSuite::G42() {
     // Move to current_position, as modified by I, J, P parameters
     destination = current_position;
 
-    if (hasI) destination.x = _GET_MESH_X(ix);
-    if (hasJ) destination.y = _GET_MESH_Y(iy);
+    if (hasI) destination.x = bedlevel.get_mesh_x(ix);
+    if (hasJ) destination.y = bedlevel.get_mesh_y(iy);
 
     #if HAS_PROBE_XY_OFFSET
       if (parser.boolval('P')) {

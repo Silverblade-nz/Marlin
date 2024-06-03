@@ -55,13 +55,13 @@ namespace ExtUI {
     LCD_SERIAL.begin(LCD_BAUDRATE);
 
     // Signal init
-    write_to_lcd_P(PSTR("{SYS:STARTED}\r\n"));
+    write_to_lcd(F("{SYS:STARTED}\r\n"));
 
     // send a version that says "unsupported"
-    write_to_lcd_P(PSTR("{VER:99}\r\n"));
+    write_to_lcd(F("{VER:99}\r\n"));
 
     // No idea why it does this twice.
-    write_to_lcd_P(PSTR("{SYS:STARTED}\r\n"));
+    write_to_lcd(F("{SYS:STARTED}\r\n"));
     update_usb_status(true);
   }
 
@@ -78,7 +78,7 @@ namespace ExtUI {
     while (LCD_SERIAL.available())
       parse_lcd_byte((byte)LCD_SERIAL.read());
 
-    #if ENABLED(SDSUPPORT)
+    #if HAS_MEDIA
       // The way last printing status works is simple:
       // The UI needs to see at least one TQ which is not 100%
       // and then when the print is complete, one which is.
@@ -98,67 +98,129 @@ namespace ExtUI {
     #endif
   }
 
-  void onPrinterKilled(PGM_P const error, PGM_P const component) {
-    set_lcd_error_P(error, component);
+  void onPrinterKilled(FSTR_P const error, FSTR_P const component) {
+    set_lcd_error(error, component);
   }
 
   #if HAS_PID_HEATING
 
-    void onPidTuning(const result_t rst) {
+    void onPIDTuning(const pidresult_t rst) {
       // Called for temperature PID tuning result
-      //SERIAL_ECHOLNPAIR("OnPidTuning:", rst);
+      //SERIAL_ECHOLNPGM("OnPIDTuning:", rst);
       switch (rst) {
-        case PID_BAD_EXTRUDER_NUM:
-          set_lcd_error_P(GET_TEXT(MSG_PID_BAD_EXTRUDER_NUM));
+        case PID_STARTED:
+        case PID_BED_STARTED:
+        case PID_CHAMBER_STARTED:
+          set_lcd_error(GET_TEXT_F(MSG_PID_AUTOTUNE));
+          break;
+        case PID_BAD_HEATER_ID:
+          set_lcd_error(GET_TEXT_F(MSG_PID_BAD_HEATER_ID));
           break;
         case PID_TEMP_TOO_HIGH:
-          set_lcd_error_P(GET_TEXT(MSG_PID_TEMP_TOO_HIGH));
+          set_lcd_error(GET_TEXT_F(MSG_PID_TEMP_TOO_HIGH));
           break;
         case PID_TUNING_TIMEOUT:
-          set_lcd_error_P(GET_TEXT(MSG_PID_TIMEOUT));
+          set_lcd_error(GET_TEXT_F(MSG_PID_TIMEOUT));
           break;
         case PID_DONE:
-          set_lcd_error_P(GET_TEXT(MSG_PID_AUTOTUNE_DONE));
+          set_lcd_error(GET_TEXT_F(MSG_PID_AUTOTUNE_DONE));
           break;
       }
     }
 
+    void onStartM303(const int count, const heater_id_t hid, const celsius_t temp) {
+      // Called by M303 to update the UI
+    }
+
   #endif
 
-  void onPrintTimerStarted() { write_to_lcd_P(PSTR("{SYS:BUILD}")); }
+  void onPrintTimerStarted() { write_to_lcd(F("{SYS:BUILD}")); }
   void onPrintTimerPaused() {}
-  void onPrintTimerStopped() { write_to_lcd_P(PSTR("{TQ:100}")); }
+  void onPrintTimerStopped() { write_to_lcd(F("{TQ:100}")); }
 
   // Not needed for Malyan LCD
   void onStatusChanged(const char * const) {}
-  void onMediaInserted() {}
+
+  void onMediaMounted() {}
   void onMediaError() {}
   void onMediaRemoved() {}
-  void onPlayTone(const uint16_t, const uint16_t) {}
+
+  void onHeatingError(const heater_id_t header_id) {}
+  void onMinTempError(const heater_id_t header_id) {}
+  void onMaxTempError(const heater_id_t header_id) {}
+
+  void onPlayTone(const uint16_t, const uint16_t/*=0*/) {}
+
   void onFilamentRunout(const extruder_t extruder) {}
   void onUserConfirmRequired(const char * const) {}
+
+  // For fancy LCDs include an icon ID, message, and translated button title
+  void onUserConfirmRequired(const int icon, const char * const cstr, FSTR_P const fBtn) {}
+  void onUserConfirmRequired(const int icon, FSTR_P const fstr, FSTR_P const fBtn) {}
+
+  #if ENABLED(ADVANCED_PAUSE_FEATURE)
+    void onPauseMode(
+      const PauseMessage message,
+      const PauseMode mode/*=PAUSE_MODE_SAME*/,
+      const uint8_t extruder/*=active_extruder*/
+    ) {}
+  #endif
+
   void onHomingStart() {}
-  void onHomingComplete() {}
-  void onPrintFinished() {}
+  void onHomingDone() {}
+
+  void onPrintDone() {}
   void onFactoryReset() {}
+
   void onStoreSettings(char*) {}
   void onLoadSettings(const char*) {}
   void onPostprocessSettings() {}
-  void onConfigurationStoreWritten(bool) {}
-  void onConfigurationStoreRead(bool) {}
+  void onSettingsStored(const bool) {}
+  void onSettingsLoaded(const bool) {}
+
+  #if HAS_LEVELING
+    void onLevelingStart() {}
+    void onLevelingDone() {}
+    #if ENABLED(PREHEAT_BEFORE_LEVELING)
+      celsius_t getLevelingBedTemp() { return LEVELING_BED_TEMP; }
+    #endif
+  #endif
 
   #if HAS_MESH
-    void onMeshLevelingStart() {}
-    void onMeshUpdate(const int8_t xpos, const int8_t ypos, const_float_t zval) {}
-    void onMeshUpdate(const int8_t xpos, const int8_t ypos, const ExtUI::probe_state_t state) {}
+    void onMeshUpdate(const int8_t, const int8_t, const_float_t) {}
+    void onMeshUpdate(const int8_t, const int8_t, const ExtUI::probe_state_t) {}
+  #endif
+
+  #if ENABLED(PREVENT_COLD_EXTRUSION)
+    void onSetMinExtrusionTemp(const celsius_t) {}
   #endif
 
   #if ENABLED(POWER_LOSS_RECOVERY)
-    void onPowerLossResume() {}
+    void onSetPowerLoss(const bool onoff) {
+      // Called when power-loss is enabled/disabled
+    }
+    void onPowerLoss() {
+      // Called when power-loss state is detected
+    }
+    void onPowerLossResume() {
+      // Called on resume from power-loss
+    }
+  #endif
+
+  #if ENABLED(MPC_AUTOTUNE)
+    void onMPCTuning(const mpcresult_t rst) {
+      // Called for temperature PID tuning result
+    }
+  #endif
+
+  #if ENABLED(PLATFORM_M997_SUPPORT)
+    void onFirmwareFlash() {}
   #endif
 
   void onSteppersDisabled() {}
-  void onSteppersEnabled()  {}
+  void onSteppersEnabled() {}
+  void onAxisDisabled(const axis_t) {}
+  void onAxisEnabled(const axis_t) {}
 }
 
 #endif // MALYAN_LCD

@@ -71,7 +71,6 @@ void UIData::set_persistent_data(uint8_t value) {
   flags.value = value & get_persistent_data_mask();
 }
 
-
 void UIData::enable_touch_sounds(bool enabled) {
   UIData::flags.bits.touch_start_sound  = enabled;
   UIData::flags.bits.touch_end_sound    = enabled;
@@ -108,7 +107,7 @@ namespace FTDI {
    *  - Dispatches onTouchStart and onTouchEnd events to the active screen.
    *  - Handles auto-repetition by sending onTouchHeld to the active screen periodically.
    *  - Plays touch feedback "click" sounds when appropriate.
-   *  - Performs debouncing to supress spurious touch events.
+   *  - Performs debouncing to suppress spurious touch events.
    */
   void EventLoop::process_events() {
     // If the LCD is processing commands, don't check

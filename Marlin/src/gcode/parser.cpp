@@ -21,7 +21,7 @@
  */
 
 /**
- * parser.cpp - Parser for a GCode line, providing a parameter interface.
+ * parser.cpp - Parser for a G-Code line, providing a parameter interface.
  */
 
 #include "parser.h"
@@ -66,7 +66,7 @@ uint16_t GCodeParser::codenum;
   char *GCodeParser::command_args; // start of parameters
 #endif
 
-// Create a global instance of the GCode parser singleton
+// Create a global instance of the G-Code parser singleton
 GCodeParser parser;
 
 /**
@@ -108,7 +108,7 @@ void GCodeParser::reset() {
 
 /**
  * Populate the command line state (command_letter, codenum, subcode, and string_arg)
- * by parsing a single line of GCode. 58 bytes of SRAM are used to speed up seen/value.
+ * by parsing a single line of G-Code. 58 bytes of SRAM are used to speed up seen/value.
  */
 void GCodeParser::parse(char *p) {
 
@@ -189,7 +189,13 @@ void GCodeParser::parse(char *p) {
       #endif
 
       // Bail if there's no command code number
-      if (!TERN(SIGNED_CODENUM, NUMERIC_SIGNED(*p), NUMERIC(*p))) return;
+      if (!TERN(SIGNED_CODENUM, NUMERIC_SIGNED(*p), NUMERIC(*p))) {
+        if (TERN0(HAS_MULTI_EXTRUDER, letter == 'T')) {
+          p[0] = '*'; p[1] = '\0'; string_arg = p; // Convert 'T' alone into 'T*'
+          command_letter = letter;
+        }
+        return;
+      }
 
       // Save the command letter at this point
       // A '?' signifies an unknown command
@@ -229,11 +235,11 @@ void GCodeParser::parse(char *p) {
         }
       #endif
 
-      } break;
+    } break;
 
     #if ENABLED(GCODE_MOTION_MODES)
 
-      #if EITHER(BEZIER_CURVE_SUPPORT, ARC_SUPPORT)
+      #if ANY(BEZIER_CURVE_SUPPORT, ARC_SUPPORT)
         case 'I' ... 'J': case 'P':
           if (TERN1(BEZIER_CURVE_SUPPORT, motion_mode_codenum != 5)
             && TERN1(ARC_P_CIRCLES, !WITHIN(motion_mode_codenum, 2, 3))
@@ -248,7 +254,7 @@ void GCodeParser::parse(char *p) {
         case 'R': if (!WITHIN(motion_mode_codenum, 2, 3)) return;
       #endif
 
-      LOGICAL_AXIS_GANG(case 'E':, case 'X':, case 'Y':, case 'Z':)
+      LOGICAL_AXIS_GANG(case 'E':, case 'X':, case 'Y':, case 'Z':, case AXIS4_NAME:, case AXIS5_NAME:, case AXIS6_NAME:, case AXIS7_NAME:, case AXIS8_NAME:, case AXIS9_NAME:)
       case 'F':
         if (motion_mode_codenum < 0) return;
         command_letter = 'G';
@@ -311,7 +317,7 @@ void GCodeParser::parse(char *p) {
     #endif
 
     #if ENABLED(FASTER_GCODE_PARSER)
-      // Arguments MUST be uppercase for fast GCode parsing
+      // Arguments MUST be uppercase for fast G-Code parsing
       #define PARAM_OK(P) WITHIN((P), 'A', 'Z')
     #else
       #define PARAM_OK(P) true
@@ -333,7 +339,7 @@ void GCodeParser::parse(char *p) {
 
       #if ENABLED(DEBUG_GCODE_PARSER)
         if (debug) {
-          SERIAL_ECHOPAIR("Got param ", AS_CHAR(param), " at index ", p - command_ptr - 1);
+          SERIAL_ECHOPGM("Got param ", C(param), " at index ", p - command_ptr - 1);
           if (has_val) SERIAL_ECHOPGM(" (has_val)");
         }
       #endif
@@ -341,7 +347,7 @@ void GCodeParser::parse(char *p) {
       if (!has_val && !string_arg) {            // No value? First time, keep as string_arg
         string_arg = p - 1;
         #if ENABLED(DEBUG_GCODE_PARSER)
-          if (debug) SERIAL_ECHOPAIR(" string_arg: ", hex_address((void*)string_arg)); // DEBUG
+          if (debug) SERIAL_ECHOPGM(" string_arg: ", hex_address((void*)string_arg)); // DEBUG
         #endif
       }
 
@@ -352,7 +358,7 @@ void GCodeParser::parse(char *p) {
     else if (!string_arg) {                     // Not A-Z? First time, keep as the string_arg
       string_arg = p - 1;
       #if ENABLED(DEBUG_GCODE_PARSER)
-        if (debug) SERIAL_ECHOPAIR(" string_arg: ", hex_address((void*)string_arg)); // DEBUG
+        if (debug) SERIAL_ECHOPGM(" string_arg: ", hex_address((void*)string_arg)); // DEBUG
       #endif
     }
 
@@ -390,7 +396,7 @@ void GCodeParser::unknown_command_warning() {
 #if ENABLED(DEBUG_GCODE_PARSER)
 
   void GCodeParser::debug() {
-    SERIAL_ECHOPAIR("Command: ", command_ptr, " (", command_letter);
+    SERIAL_ECHOPGM("Command: ", command_ptr, " (", command_letter);
     SERIAL_ECHO(codenum);
     SERIAL_ECHOLNPGM(")");
     #if ENABLED(FASTER_GCODE_PARSER)
@@ -398,18 +404,18 @@ void GCodeParser::unknown_command_warning() {
       for (char c = 'A'; c <= 'Z'; ++c) if (seen(c)) SERIAL_CHAR(c, ' ');
       SERIAL_CHAR('}');
     #else
-      SERIAL_ECHOPAIR(" args: { ", command_args, " }");
+      SERIAL_ECHOPGM(" args: { ", command_args, " }");
     #endif
     if (string_arg) {
-      SERIAL_ECHOPAIR(" string: \"", string_arg);
+      SERIAL_ECHOPGM(" string: \"", string_arg);
       SERIAL_CHAR('"');
     }
     SERIAL_ECHOLNPGM("\n");
     for (char c = 'A'; c <= 'Z'; ++c) {
       if (seen(c)) {
-        SERIAL_ECHOPAIR("Code '", c); SERIAL_ECHOPGM("':");
+        SERIAL_ECHOPGM("Code '", c); SERIAL_ECHOPGM("':");
         if (has_value()) {
-          SERIAL_ECHOLNPAIR(
+          SERIAL_ECHOLNPGM(
             "\n    float: ", value_float(),
             "\n     long: ", value_long(),
             "\n    ulong: ", value_ulong(),

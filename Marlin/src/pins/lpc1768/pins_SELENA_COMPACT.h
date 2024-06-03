@@ -23,6 +23,7 @@
 
 /**
  * Selena Compact pin assignments
+ * Schematic: https://github.com/f61/Selena/blob/master/Compact%20Pinout.pdf
  */
 
 #include "env_validate.h"
@@ -40,10 +41,8 @@
 //
 #define X_MIN_PIN                          P1_28
 #define X_MAX_PIN                          P1_25
-#define Y_MIN_PIN                          P2_11
-#define Y_MAX_PIN                          -1
-#define Z_MIN_PIN                          P1_27
-#define Z_MAX_PIN                          -1
+#define Y_STOP_PIN                         P2_11
+#define Z_STOP_PIN                         P1_27
 #ifndef Z_MIN_PROBE_PIN
   #define Z_MIN_PROBE_PIN                  P1_22
 #endif
@@ -87,8 +86,8 @@
 #define HEATER_BED2_PIN                    P2_04
 #define HEATER_0_PIN                       P2_07
 #define HEATER_1_PIN                       P2_06
-#ifndef FAN_PIN
-  #define FAN_PIN                          P1_24
+#ifndef FAN0_PIN
+  #define FAN0_PIN                         P1_24
 #endif
 #define FAN1_PIN                           P1_26
 
@@ -98,7 +97,7 @@
 
 #if IS_RRD_FG_SC
   #define LCD_PINS_RS                      P0_16
-  #define LCD_PINS_ENABLE                  P0_18
+  #define LCD_PINS_EN                      P0_18
   #define LCD_PINS_D4                      P0_15
   #define LCD_PINS_D5                      P1_00
   #define LCD_PINS_D6                      P1_01

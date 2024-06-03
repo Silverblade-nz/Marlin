@@ -40,9 +40,9 @@
 //
 // Limit Switches
 //
-#define X_MIN_PIN                             22  // PB26
-#define Y_MAX_PIN                             18  // PA11
-#define Z_MIN_PIN                             19  // PA10
+#define X_STOP_PIN                            22  // PB26
+#define Y_STOP_PIN                            18  // PA11
+#define Z_STOP_PIN                            19  // PA10
 
 //
 // Z Probe (when not Z_MIN_PIN)
@@ -62,7 +62,7 @@
 // LED defines
 //
 //#define NEOPIXEL_TYPE                 NEO_GRBW  // NEO_GRBW / NEO_GRB - four/three channel driver type (defined in Adafruit_NeoPixel.h)
-//#define NEOPIXEL_PIN                        20  // LED driving pin on motherboard
+//#define BOARD_NEOPIXEL_PIN                  20  // LED driving pin on motherboard
 //#define NEOPIXEL_PIXELS                      3  // Number of LEDs in the strip
 //#define SDA0                                20  // PB12 NeoPixel pin I2C data
 //#define SCL0                                21  // PB13              I2C clock
@@ -138,8 +138,8 @@
 #define HEATER_0_PIN                          40  // PA5
 #define HEATER_BED_PIN                        41  // PB24
 
-#ifndef FAN_PIN
-  #define FAN_PIN                             13  //  PB27 Fan1A
+#ifndef FAN0_PIN
+  #define FAN0_PIN                            13  //  PB27 Fan1A
 #endif
 #define FAN1_PIN                              58  //  PA6  Fan1B
 

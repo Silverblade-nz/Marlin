@@ -30,21 +30,13 @@
 #endif
 #include "../../core/serial_hook.h"
 
-#ifndef SERIAL_PORT
-  #define SERIAL_PORT 0
-#endif
-#ifndef RX_BUFFER_SIZE
-  #define RX_BUFFER_SIZE 128
-#endif
-#ifndef TX_BUFFER_SIZE
-  #define TX_BUFFER_SIZE 32
-#endif
-
 class MarlinSerial : public HardwareSerial<RX_BUFFER_SIZE, TX_BUFFER_SIZE> {
 public:
   MarlinSerial(LPC_UART_TypeDef *UARTx) : HardwareSerial<RX_BUFFER_SIZE, TX_BUFFER_SIZE>(UARTx) { }
 
   void end() {}
+
+  uint8_t availableForWrite(void) { /* flushTX(); */ return TX_BUFFER_SIZE; }
 
   #if ENABLED(EMERGENCY_PARSER)
     bool recv_callback(const char c) override;

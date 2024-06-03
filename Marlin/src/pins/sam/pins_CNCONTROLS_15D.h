@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
 /**
  * CNControls V15 for HMS434 with DUE pin assignments
@@ -90,7 +91,7 @@
 //
 // Fans
 //
-//#define FAN_PIN                              8
+//#define FAN0_PIN                             8
 
 //
 // Auto fans
